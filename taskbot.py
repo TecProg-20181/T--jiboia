@@ -8,10 +8,13 @@ import urllib
 
 import sqlalchemy
 
+from tokenbot import *
+
 import db
 from db import Task
 
-TOKEN = ""
+TOKEN = catch_token
+
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 
 HELP = """
