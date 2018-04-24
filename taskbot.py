@@ -184,7 +184,7 @@ def handle_updates(updates):
 
         elif command == '/todo':
             if not msg.isdigit():
-                send_message("You must inform the task id", chat)KeyError: ''
+                send_message("You must inform the task id", chat)
 
             else:
                 task_id = int(msg)
