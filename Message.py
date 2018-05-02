@@ -24,6 +24,7 @@ class Message:
                          /help
                         """
 
+    @staticmethod
     def get_last_update_id(updates):
         update_ids = []
         for update in updates['result']:
