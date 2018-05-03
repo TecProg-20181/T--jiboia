@@ -8,10 +8,13 @@ import urllib
 
 import sqlalchemy
 
+from tokenbot import *
+
 import db
 from db import Task
 
-TOKEN = ""
+TOKEN = catch_token()
+
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 
 HELP = """
@@ -54,7 +57,7 @@ def send_message(text, chat_id, reply_markup=None):
 
 def get_last_update_id(updates):
     update_ids = []
-    for update in updates["result"]:
+    for update in updates['result']:
         update_ids.append(int(update["update_id"]))
 
     return max(update_ids)
@@ -124,7 +127,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
 
@@ -144,7 +147,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
 
@@ -168,7 +171,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
                 for t in task.dependencies.split(',')[:-1]:
@@ -182,12 +185,13 @@ def handle_updates(updates):
         elif command == '/todo':
             if not msg.isdigit():
                 send_message("You must inform the task id", chat)
+
             else:
                 task_id = int(msg)
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
                 task.status = 'TODO'
@@ -202,7 +206,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
                 task.status = 'DOING'
@@ -217,7 +221,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
                 task.status = 'DONE'
@@ -271,7 +275,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
 
@@ -294,7 +298,7 @@ def handle_updates(updates):
                             try:
                                 taskdep = query.one()
                                 taskdep.parents += str(task.id) + ','
-                            except sqlalchemy.orm.exc.NoResultFound:
+                            except sqlalchemy.orm.exc.NoFound:
                                 send_message("_404_ Task {} not found x.x".format(depid), chat)
                                 continue
 
@@ -318,7 +322,7 @@ def handle_updates(updates):
                 query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                 try:
                     task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
+                except sqlalchemy.orm.exc.NoFound:
                     send_message("_404_ Task {} not found x.x".format(task_id), chat)
                     return
 
@@ -344,13 +348,15 @@ def handle_updates(updates):
 
 
 def main():
-    last_update_id = None
+    last_update_id = ''
 
     while True:
         print("Updates")
         updates = get_updates(last_update_id)
 
-        if len(updates["result"]) > 0:
+        print(updates)
+
+        if len(updates['result']) > 0:
             last_update_id = get_last_update_id(updates) + 1
             handle_updates(updates)
 
