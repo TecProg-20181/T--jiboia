@@ -1,3 +1,3 @@
 def catch_token():
-        token_bot = "590599934:AAF654okuQbpHtrolNBG_UO_nTsM0C2I6Xc"
+        token_bot = ""
         return token_bot
