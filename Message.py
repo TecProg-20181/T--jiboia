@@ -84,7 +84,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     if text == '':
@@ -102,7 +102,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     dtask = Task(chat=task.chat, name=task.name, status=task.status, dependencies=task.dependencies,
@@ -122,7 +122,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     for t in task.dependencies.split(',')[:-1]:
@@ -140,7 +140,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     task.status = 'TODO'
@@ -154,7 +154,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     task.status = 'DOING'
@@ -168,7 +168,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     task.status = 'DONE'
@@ -215,7 +215,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     if text == '':
@@ -236,7 +236,7 @@ class Message:
                                 try:
                                     taskdep = query.one()
                                     taskdep.parents += str(task.id) + ','
-                                except sqlalchemy.orm.exc.NoFound:
+                                except sqlalchemy.orm.exc.NoResultFound:
                                     self.u.send_message("_404_ Task {} not found x.x".format(depid), chat)
                                     continue
                                 deplist = task.dependencies.split(',')
@@ -257,7 +257,7 @@ class Message:
                     query = db.session.query(Task).filter_by(id=task_id, chat=chat)
                     try:
                         task = query.one()
-                    except sqlalchemy.orm.exc.NoFound:
+                    except sqlalchemy.orm.exc.NoResultFound:
                         self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
                         return
                     if text == '':
