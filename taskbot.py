@@ -258,22 +258,40 @@ def handle_updates(updates):
 
             send_message(a, chat)
             a = ''
-
+            
             a += '\U0001F4DD _Status_\n'
+
             query = db.session.query(Task).filter_by(status='TODO', chat=chat).order_by(Task.id)
             a += '\n\U0001F195 *TODO*\n'
+            
+            for task in query.all():
+                a += '[[{}]] {}\n'.format(task.id, task.name)
+            query = db.session.query(Task).filter_by(priority='high', chat=chat).order_by(Task.id)
+            a += '\U0001F6F0 *HIGH*\n'
+            for task in query.all():
+                a += '[[{}]] {}\n'.format(task.id, task.name)
+            query = db.session.query(Task).filter_by(priority='medium', chat=chat).order_by(Task.id)
+            a += '\U0001F6F0 *MEDIUM*\n'
+            for task in query.all():
+                a += '[[{}]] {}\n'.format(task.id, task.name)
+            query = db.session.query(Task).filter_by(priority='low', chat=chat).order_by(Task.id)
+            a += '\U0001F6F0 *LOW*\n'
+
             for task in query.all():
                 print(task.name)
                 a += '[[{}]] {}\n'.format(task.id, task.name)
             query = db.session.query(Task).filter_by(status='DOING', chat=chat).order_by(Task.id)
             a += '\n\U000023FA *DOING*\n'
+
             for task in query.all():
                 a += '[[{}]] {}\n'.format(task.id, task.name)
             query = db.session.query(Task).filter_by(status='DONE', chat=chat).order_by(Task.id)
-            a += '\n\U00002611 *DONE*\n'
+            a += '\n\U00002611 *DONE*\n'           
+
+
             for task in query.all():
                 a += '[[{}]] {}\n'.format(task.id, task.name)
-
+            
             send_message(a, chat)
         elif command == '/dependson':
             text = ''
