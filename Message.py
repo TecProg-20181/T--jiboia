@@ -2,6 +2,7 @@ import sqlalchemy
 import db
 from db import Task
 from Url import Url
+from createIssues import *
 
 
 class Message:
@@ -52,6 +53,7 @@ class Message:
         return text
 
     def handle_updates(self, updates):
+        
         for update in updates["result"]:
             if 'message' in update:
                 message = update['message']
@@ -71,6 +73,7 @@ class Message:
                 db.session.add(task)
                 db.session.commit()
                 self.u.send_message("New task *TODO* [[{}]] {}".format(task.id, task.name), chat)
+                make_github_issue(task.name, '')
             elif command == '/rename':
                 text = ''
                 if msg != '':
