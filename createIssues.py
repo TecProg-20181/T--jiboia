@@ -5,7 +5,7 @@ import requests
 
 # Authentication for user filing issue (must have read/write access to
 # repository to add issue to)
-user = 'oliveiraMarcelo'
+user = ''
 password = ''
 
 # The repository to add this issue to

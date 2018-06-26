@@ -57,7 +57,9 @@ class Message:
             task = Task(chat=chat, name=msg, status='TODO', dependencies='', parents='', priority='')
             db.session.add(task)
             db.session.commit()
+            make_github_issue(task.name, '')
             self.u.send_message("New task *TODO* [[{}]] {}".format(task.id, task.name), chat)
+            
 
         def rename_assigment (msg, chat):
             text = ''
@@ -103,7 +105,7 @@ class Message:
                     t.parents += '{},'.format(dtask.id)
                 db.session.commit()
                 self.u.send_message("New task *TODO* [[{}]] {}".format(dtask.id, dtask.name), chat)
-                make_github_issue(task.name, '')
+                
 
         def delete_assigment(msg, chat):
             if not msg.isdigit():
