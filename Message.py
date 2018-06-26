@@ -123,49 +123,55 @@ class Message:
                 self.u.send_message("Task [[{}]] deleted".format(task_id), chat)
 
         def todo_assigment (msg, chat):
-            if not msg.isdigit():
-                self.u.send_message("You must inform the task id", chat)
-            else:
-                task_id = int(msg)
-                query = db.session.query(Task).filter_by(id=task_id, chat=chat)
-                try:
-                    task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
-                    self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
-                    return
-                task.status = 'TODO'
-                db.session.commit()
-                self.u.send_message("*TODO* task [[{}]] {}".format(task.id, task.name), chat)
+            id_list = msg.split(" ")
+            for id in id_list:
+                if not id.isdigit():
+                    send_message("You must inform the task id", chat)
+                else:
+                    task_id = int(id)
+                    query = db.session.query(Task).filter_by(id=task_id, chat=chat)
+                    try:
+                        task = query.one()
+                    except sqlalchemy.orm.exc.NoResultFound:
+                        send_message("_404_ Task {} not found x.x".format(task_id), chat)
+                        return
+                    task.status = 'TODO'
+                    db.session.commit()
+                    send_message("*TODO* task [[{}]] {}".format(task.id, task.name), chat)
 
         def doing_assigment(msg, chat):
-            if not msg.isdigit():
-                self.u.send_message("You must inform the task id", chat)
-            else:
-                task_id = int(msg)
-                query = db.session.query(Task).filter_by(id=task_id, chat=chat)
-                try:
-                    task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
-                    self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
-                    return
-                task.status = 'DOING'
-                db.session.commit()
-                self.u.send_message("*DOING* task [[{}]] {}".format(task.id, task.name), chat)
+            id_list = msg.split(" ")
+            for id in id_list:
+                if not id.isdigit():
+                    send_message("You must inform the task id", chat)
+                else:
+                    task_id = int(id)
+                    query = db.session.query(Task).filter_by(id=task_id, chat=chat)
+                    try:
+                        task = query.one()
+                    except sqlalchemy.orm.exc.NoResultFound:
+                        send_message("_404_ Task {} not found x.x".format(task_id), chat)
+                        return
+                    task.status = 'DOING'
+                    db.session.commit()
+                    send_message("*DOING* task [[{}]] {}".format(task.id, task.name), chat)
 
         def done_assigment(msg, chat):
-            if not msg.isdigit():
-                self.u.send_message("You must inform the task id", chat)
-            else:
-                task_id = int(msg)
-                query = db.session.query(Task).filter_by(id=task_id, chat=chat)
-                try:
-                    task = query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
-                    self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
-                    return
-                task.status = 'DONE'
-                db.session.commit()
-                self.u.send_message("*DONE* task [[{}]] {}".format(task.id, task.name), chat)
+            id_list = msg.split(" ")
+            for id in id_list:
+                if not id.isdigit():
+                    send_message("You must inform the task id", chat)
+                else:
+                    task_id = int(id)
+                    query = db.session.query(Task).filter_by(id=task_id, chat=chat)
+                    try:
+                        task = query.one()
+                    except sqlalchemy.orm.exc.NoResultFound:
+                        send_message("_404_ Task {} not found x.x".format(task_id), chat)
+                        return
+                    task.status = 'DONE'
+                    db.session.commit()
+                    send_message("*DONE* task [[{}]] {}".format(task.id, task.name), chat)
 
         def list_assigment (msg, chat):
             a = ''
@@ -186,6 +192,7 @@ class Message:
             a += '\n\U0001F195 *TODO*\n'
 
             for task in query.all():
+                print(task.name)
                 a += '[[{}]] {}\n'.format(task.id, task.name)
             query = db.session.query(Task).filter_by(priority='high', chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *HIGH*\n'
@@ -311,6 +318,12 @@ class Message:
             else:
                 print('Can\'t process! {}'.format(update))
                 return
+
+            try:
+                text = message["text"]
+            except:
+                message["text"] = ""
+
             command = message["text"].split(" ", 1)[0]
             msg = ''
             if len(message["text"].split(" ", 1)) > 1:
