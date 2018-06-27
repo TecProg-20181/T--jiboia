@@ -21,11 +21,11 @@ class Task(Base):
     dependencies = Column(String)
     parents = Column(String)
     priority = Column(String)
-    duedate = Column(Date)
+    duedate = Column(String)
 
     def __repr__(self):
-        return "<Task(id={}, chat={}, name='{}', status='{}')>".format(
-            self.id, self.chat, self.name, self.status
+        return "<Task(id={}, chat={}, name='{}', status='{}', duedate='{}')>".format(
+            self.id, self.chat, self.name, self.status, self.duedate
         )
 
 Base.metadata.create_all(engine)
