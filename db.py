@@ -21,7 +21,7 @@ class Task(Base):
     dependencies = Column(String)
     parents = Column(String)
     priority = Column(String)
-    duedate = Column(Date)
+    duedate = Column(String)
 
     def __repr__(self):
         return "<Task(id={}, chat={}, name='{}', status='{}', duedate='{}')>".format(

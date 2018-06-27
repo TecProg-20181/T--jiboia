@@ -54,7 +54,9 @@ class Message:
 
     def handle_updates(self, updates):
         def new_assigment(msg, chat):
-            task = Task(chat=chat, name=msg, status='TODO', dependencies='', parents='', priority='', duedate='')
+            duedate = msg.split(' ', 1)[1]
+            msg = msg.split(' ', 1)[0]
+            task = Task(chat=chat, name=msg, status='TODO', dependencies='', parents='', priority='', duedate=duedate)
             db.session.add(task)
             db.session.commit()
             make_github_issue(task.name, '')
@@ -185,7 +187,7 @@ class Message:
                     icon = '\U000023FA'
                 elif task.status == 'DONE':
                     icon = '\U00002611'
-                a += '[[{}]] {} {}\n'.format(task.id, icon, task.name)
+                a += '[[{}]] {} {} - {}\n'.format(task.id, icon, task.name, task.duedate)
                 a += self.deps_text(task, chat)
             self.u.send_message(a, chat)
             a = ''
@@ -195,28 +197,28 @@ class Message:
 
             for task in query.all():
                 print(task.name)
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             query = db.session.query(Task).filter_by(priority='high', chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *HIGH*\n'
             for task in query.all():
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             query = db.session.query(Task).filter_by(priority='medium', chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *MEDIUM*\n'
             for task in query.all():
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             query = db.session.query(Task).filter_by(priority='low', chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *LOW*\n'
 
             for task in query.all():
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             query = db.session.query(Task).filter_by(status='DOING', chat=chat).order_by(Task.id)
             a += '\n\U000023FA *DOING*\n'
             for task in query.all():
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             query = db.session.query(Task).filter_by(status='DONE', chat=chat).order_by(Task.id)
             a += '\n\U00002611 *DONE*\n'
             for task in query.all():
-                a += '[[{}]] {}\n'.format(task.id, task.name)
+                a += '[[{}]] {} - {}\n'.format(task.id, task.name, task.duedate)
             self.u.send_message(a, chat)
 
         def dependson_assigment(msg, chat):
