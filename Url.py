@@ -1,7 +1,7 @@
 import json
 import requests
 import urllib
-from tokenbot import *
+from tokenbot import catch_token
 
 
 class Url:
@@ -33,7 +33,8 @@ class Url:
 
     def send_message(self, text, chat_id, reply_markup=None):
         text = urllib.parse.quote_plus(text)
-        url = self.url + "sendMessage?text={}&chat_id={}&parse_mode=Markdown".format(text, chat_id)
+        msg_mark = "sendMessage?text={}&chat_id={}&parse_mode=Markdown"
+        url = self.url + msg_mark.format(text, chat_id)
         if reply_markup:
             url += "&reply_markup={}".format(reply_markup)
         self.get_url(url)

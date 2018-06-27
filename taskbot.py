@@ -4,6 +4,7 @@ from Url import Url
 from Message import Message
 import time
 
+
 def main():
     u = Url()
     m = Message()
