@@ -12,7 +12,7 @@ class Message:
 
     def __init__(self):
         self.str_help = """
-                         /new NOME
+                         /new NOME DUEDATE
                          /todo ID
                          /doing ID
                          /done ID
@@ -53,39 +53,38 @@ class Message:
         return text
 
     def handle_updates(self, updates):
-        def new_assigment (msg, chat):
-            task = Task(chat=chat, name=msg, status='TODO', dependencies='', parents='', priority='')
+        def new_assigment(msg, chat):
+            task = Task(chat=chat, name=msg, status='TODO', dependencies='', parents='', priority='', duedate='')
             db.session.add(task)
             db.session.commit()
             make_github_issue(task.name, '')
-            self.u.send_message("New task *TODO* [[{}]] {}".format(task.id, task.name), chat)
-            
+            self.u.send_message("New task *TODO* [[{}]] {} - {}".format(task.id, task.name, task.duedate), chat)
 
-        def rename_assigment (msg, chat):
+        def rename_assigment(msg, chat):
             text = ''
             if msg != '':
-               if len(msg.split(' ', 1)) > 1:
-                   text = msg.split(' ', 1)[1]
-                   msg = msg.split(' ', 1)[0]
+                if len(msg.split(' ', 1)) > 1:
+                    text = msg.split(' ', 1)[1]
+                    msg = msg.split(' ', 1)[0]
             if not msg.isdigit():
-               self.u.send_message("You must inform the task id", chat)
+                self.u.send_message("You must inform the task id", chat)
             else:
-               task_id = int(msg)
-               query = db.session.query(Task).filter_by(id=task_id, chat=chat)
-               try:
-                  task = query.one()
-               except sqlalchemy.orm.exc.NoResultFound:
-                  self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
-                  return
-               if text == '':
-                  self.u.send_message("You want to modify task {}, but you didn't provide any new text".format(task_id), chat)
-                  return
-               old_text = task.name
-               task.name = text
-               db.session.commit()
-               self.u.send_message("Task {} redefined from {} to {}".format(task_id, old_text, text), chat)
+                task_id = int(msg)
+                query = db.session.query(Task).filter_by(id=task_id, chat=chat)
+                try:
+                    task = query.one()
+                except sqlalchemy.orm.exc.NoResultFound:
+                    self.u.send_message("_404_ Task {} not found x.x".format(task_id), chat)
+                    return
+                if text == '':
+                    self.u.send_message("You want to modify task {}, but you didn't provide any new text".format(task_id), chat)
+                    return
+                old_text = task.name
+                task.name = text
+                db.session.commit()
+                self.u.send_message("Task {} redefined from {} to {}".format(task_id, old_text, text), chat)
 
-        def duplicate_assigment (msg, chat):
+        def duplicate_assigment(msg, chat):
             if not msg.isdigit():
                 self.u.send_message("You must inform the task id", chat)
             else:
@@ -105,7 +104,6 @@ class Message:
                     t.parents += '{},'.format(dtask.id)
                 db.session.commit()
                 self.u.send_message("New task *TODO* [[{}]] {}".format(dtask.id, dtask.name), chat)
-                
 
         def delete_assigment(msg, chat):
             if not msg.isdigit():
@@ -126,7 +124,7 @@ class Message:
                 db.session.commit()
                 self.u.send_message("Task [[{}]] deleted".format(task_id), chat)
 
-        def todo_assigment (msg, chat):
+        def todo_assigment(msg, chat):
             id_list = msg.split(" ")
             for id in id_list:
                 if not id.isdigit():
@@ -177,7 +175,7 @@ class Message:
                     db.session.commit()
                     send_message("*DONE* task [[{}]] {}".format(task.id, task.name), chat)
 
-        def list_assigment (msg, chat):
+        def list_assigment(msg, chat):
             a = ''
             a += '\U0001F4CB Task List\n'
             query = db.session.query(Task).filter_by(parents='', chat=chat).order_by(Task.id)
@@ -337,21 +335,21 @@ class Message:
             if command == '/new':
                 new_assigment(msg, chat)
             elif command == '/rename':
-                rename_assigment (msg, chat)
+                rename_assigment(msg, chat)
             elif command == '/duplicate':
                 duplicate_assigment(msg, chat)
             elif command == '/delete':
-                delete_assigment (msg, chat)
+                delete_assigment(msg, chat)
             elif command == '/todo':
                 todo_assigment(msg, chat)
             elif command == '/doing':
                 doing_assigment(msg, chat)
             elif command == '/done':
-                done_assigment (msg,chat)
+                done_assigment(msg, chat)
             elif command == '/list':
-                list_assigment (msg, chat)
+                list_assigment(msg, chat)
             elif command == '/dependson':
-                dependson_assigment (msg, chat)
+                dependson_assigment(msg, chat)
             elif command == '/priority':
                 priority_assigment(msg, chat)
             elif command == '/start':
