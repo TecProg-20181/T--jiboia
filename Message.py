@@ -13,7 +13,7 @@ class Message:
 
     def __init__(self):
         self.str_help = """
-                         /new NOME DUEDATE
+                         /new NOME DUEDATE{year-month-day}
                          /todo ID
                          /doing ID
                          /done ID
@@ -57,22 +57,32 @@ class Message:
 
     def handle_updates(self, updates):
         def new_assigment(msg, chat):
-            duedate = msg.split(' ', 1)[1]
-            msg = msg.split(' ', 1)[0]
-            task = Task(chat=chat,
-                        name=msg,
-                        status='TODO',
-                        dependencies='',
-                        parents='',
-                        priority='',
-                        duedate=datetime.strptime(duedate, "%d/%m/%Y").date())
-            db.session.add(task)
-            db.session.commit()
-            make_github_issue(task.name, '')
-            msg_new_task = "New task *TODO* [[{}]] {} - {}"
-            self.u.send_message(msg_new_task.format(task.id,
-                                                    task.name,
-                                                    task.duedate), chat)
+            try:
+                date = msg.split(' ', 1)[1]
+                msg = msg.split(' ', 1)[0]
+                duedate = datetime.strptime(date, "%Y-%m-%d").date()
+                if duedate >= datetime.today().date():
+                    task = Task(chat=chat,
+                                name=msg,
+                                status='TODO',
+                                dependencies='',
+                                parents='',
+                                priority='',
+                                duedate=duedate)
+                    db.session.add(task)
+                    db.session.commit()
+                    make_github_issue(task.name, '')
+                    msg_new_task = "New task *TODO* [[{}]] {} ({})"
+                    self.u.send_message(msg_new_task.format(task.id,
+                                                            task.name,
+                                                            task.duedate), chat)
+                else:
+                    msg_due = "You must inform the task duedate correctly"
+                    self.u.send_message(msg_due, chat)
+            except IndexError:
+                self.u.send_message("You must inform a NAME and DUEDATE", chat)
+            except ValueError:
+                self.u.send_message("You must inform a DUEDATE correctly", chat)
 
         def rename_assigment(msg, chat):
             text = ''
@@ -229,7 +239,7 @@ class Message:
                     icon = '\U000023FA'
                 elif task.status == 'DONE':
                     icon = '\U00002611'
-                a += '[[{}]] {} {} - {}\n'.format(task.id,
+                a += '[[{}]] {} {} ({})\n'.format(task.id,
                                                   icon,
                                                   task.name,
                                                   task.duedate)
@@ -243,21 +253,21 @@ class Message:
 
             for task in query.all():
                 print(task.name)
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             query = db.session.query(Task).filter_by(priority='high',
                                                      chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *HIGH*\n'
             for task in query.all():
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             query = db.session.query(Task).filter_by(priority='medium',
                                                      chat=chat).order_by(Task.id)
             a += '\U0001F6F0 *MEDIUM*\n'
             for task in query.all():
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             query = db.session.query(Task).filter_by(priority='low',
@@ -265,21 +275,21 @@ class Message:
             a += '\U0001F6F0 *LOW*\n'
 
             for task in query.all():
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             query = db.session.query(Task).filter_by(status='DOING',
                                                      chat=chat).order_by(Task.id)
             a += '\n\U000023FA *DOING*\n'
             for task in query.all():
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             query = db.session.query(Task).filter_by(status='DONE',
                                                      chat=chat).order_by(Task.id)
             a += '\n\U00002611 *DONE*\n'
             for task in query.all():
-                a += '[[{}]] {} - {}\n'.format(task.id,
+                a += '[[{}]] {} ({})\n'.format(task.id,
                                                task.name,
                                                task.duedate)
             self.u.send_message(a, chat)
